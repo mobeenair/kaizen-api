@@ -7,8 +7,10 @@ describe('Reqres API Endpoints Validation', () => {
     cy.request(`/users?page=2`)
       .should((response) => {
         expect(response.status).to.eq(200);
-        expect(response.body.data).to.have.length(6);
-        expect(response.body).to.be.jsonSchema(listUsersSchema);
+        let resBody = response.body
+        expect(resBody.data).to.have.length(6);
+        expect(resBody).to.have.property("page", 2)
+        expect(resBody).to.be.jsonSchema(listUsersSchema);
       });
   });
 
@@ -16,8 +18,9 @@ describe('Reqres API Endpoints Validation', () => {
     cy.request(`/users/2`)
       .should((response) => {
         expect(response.status).to.eq(200);
-        expect(response.body.data).to.have.property('id', 2);
-        expect(response.body).to.be.jsonSchema(singleUserSchema);
+        let resBody = response.body
+        expect(resBody.data).to.have.property('id', 2);
+        expect(resBody).to.be.jsonSchema(singleUserSchema);
       });
   });
 
@@ -26,10 +29,12 @@ describe('Reqres API Endpoints Validation', () => {
       cy.request('POST', `/users`, data.createUser)
         .should((response) => {
           expect(response.status).to.eq(201);
-          expect(response.body).to.have.property('name', data.createUser.name);
-          expect(response.body).to.have.property('job', data.createUser.job);
-
-          expect(response.body).to.be.jsonSchema(createUserSchema);
+          let res = response.body
+          // check data
+          expect(res).to.have.property('name', data.createUser.name);
+          expect(res).to.have.property('job', data.createUser.job);
+          // check schema
+          expect(res).to.be.jsonSchema(createUserSchema);
         });
     });
   });
@@ -39,10 +44,10 @@ describe('Reqres API Endpoints Validation', () => {
       cy.request('PUT', `/users/2`, data.updateUser)
         .should((response) => {
           expect(response.status).to.eq(200);
-          expect(response.body).to.have.property('name', data.updateUser.name);
-          expect(response.body).to.have.property('job', data.updateUser.job);
-
-          expect(response.body).to.be.jsonSchema(updateUserSchema);
+          let res = response.body
+          expect(res).to.have.property('name', data.updateUser.name);
+          expect(res).to.have.property('job', data.updateUser.job);
+          expect(res).to.be.jsonSchema(updateUserSchema);
         });
     });
   });
@@ -53,5 +58,18 @@ describe('Reqres API Endpoints Validation', () => {
         expect(response.status).to.eq(204);
         expect(response.body).to.be.empty;
       });
+  });
+
+  // DELAYED RESPONSE
+  it('GET Delayed Response', () => {
+    const start = Date.now();
+  
+    cy.request('/users?delay=3').then((response) => {
+      
+      expect(response.status).to.eq(200);
+      const duration = Date.now() - start; // duration to get reponse >= ~3s
+      expect(duration).to.be.gte(2900);
+      expect(response.body.data).to.be.an('array');
+    });
   });
 });
