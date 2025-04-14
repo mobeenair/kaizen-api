@@ -12,9 +12,9 @@ npm install
 
 ### **Run Cypress Tests**
 
-#### **Interactive Mode (Opens Cypress GUI)**
+#### **Run Cypress tests in UI mode**
 
-Navigate to the test cases and execute them in UI mode
+Navigate to the users.cy.js test and execute in interactive mode
 
 ```sh
 npx cypress open

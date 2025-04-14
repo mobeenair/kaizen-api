@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "chai-json-schema": "^1.5.1",
     "cypress": "^14.3.0"
   }
 }
